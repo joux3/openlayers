@@ -93,6 +93,12 @@ ol.renderer.canvas.TileLayer.prototype.isDrawableTile_ = function(tile) {
       tileState == ol.TileState.ERROR && !useInterimTilesOnError;
 };
 
+ol.renderer.canvas.TileLayer.prototype.loadedTileFilter = function() {
+  return true;
+};
+
+ol.renderer.canvas.TileLayer.prototype.tileWouldBeUsed = function() {};
+
 /**
  * @inheritDoc
  */
@@ -135,7 +141,7 @@ ol.renderer.canvas.TileLayer.prototype.prepareFrame = function(frameState, layer
   tilesToDrawByZ[z] = {};
 
   var findLoadedTiles = this.createLoadedTileFinder(
-      tileSource, projection, tilesToDrawByZ);
+      tileSource, projection, tilesToDrawByZ, this.loadedTileFilter);
 
   var tmpExtent = this.tmpExtent;
   var tmpTileRange = this.tmpTileRange_;
@@ -149,9 +155,13 @@ ol.renderer.canvas.TileLayer.prototype.prepareFrame = function(frameState, layer
       }
       if (this.isDrawableTile_(tile)) {
         if (tile.getState() == ol.TileState.LOADED) {
-          tilesToDrawByZ[z][tile.tileCoord.toString()] = tile;
-          if (!newTiles && this.renderedTiles.indexOf(tile) == -1) {
-            newTiles = true;
+          if (this.loadedTileFilter(tile)) {
+            tilesToDrawByZ[z][tile.tileCoord.toString()] = tile;
+            if (!newTiles && this.renderedTiles.indexOf(tile) == -1) {
+              newTiles = true;
+            }
+          } else {
+            this.tileWouldBeUsed(tile, frameState);
           }
         }
         continue;

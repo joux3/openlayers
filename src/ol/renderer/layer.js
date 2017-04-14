@@ -64,7 +64,7 @@ ol.renderer.Layer.prototype.hasFeatureAtCoordinate = ol.functions.FALSE;
  *     lookup.
  * @protected
  */
-ol.renderer.Layer.prototype.createLoadedTileFinder = function(source, projection, tiles) {
+ol.renderer.Layer.prototype.createLoadedTileFinder = function(source, projection, tiles, tileFilter) {
   return (
       /**
        * @param {number} zoom Zoom level.
@@ -73,6 +73,9 @@ ol.renderer.Layer.prototype.createLoadedTileFinder = function(source, projection
        */
       function(zoom, tileRange) {
         function callback(tile) {
+          if (tileFilter && !tileFilter(tile)) {
+            return;
+          }
           if (!tiles[zoom]) {
             tiles[zoom] = {};
           }
