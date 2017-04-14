@@ -33,6 +33,8 @@ ol.renderer.canvas.VectorTileLayer = function(layer) {
    */
   this.renderedLayerRevision_;
 
+  this.tilesThatWouldBeUsed_ = [];
+
   /**
    * @private
    * @type {ol.Transform}
@@ -71,6 +73,7 @@ ol.renderer.canvas.VectorTileLayer.VECTOR_REPLAYS = {
  * @inheritDoc
  */
 ol.renderer.canvas.VectorTileLayer.prototype.prepareFrame = function(frameState, layerState) {
+  this.tilesThatWouldBeUsed_ = []
   var layer = this.getLayer();
   var layerRevision = layer.getRevision();
   if (this.renderedLayerRevision_ != layerRevision) {
@@ -186,6 +189,11 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
     if (replayState.inProgressRevision !== revision || replayState.inProgressRenderOrder !== renderOrder) {
       return;
     }
+    if (this.tilesThatWouldBeUsed_.indexOf(tile) === -1) {
+      replayState.inProgressRevision = -1;
+      replayState.inProgressRenderOrder = undefined;
+      return;
+    }
     var feature;
     for (var ii = features.length; i < ii; ++i) {
       feature = features[i];
@@ -226,6 +234,7 @@ ol.renderer.canvas.VectorTileLayer.prototype.drawTileImage = function(
 
 
 ol.renderer.canvas.VectorTileLayer.prototype.tileWouldBeUsed = function(tile, frameState) {
+  this.tilesThatWouldBeUsed_.push(tile);
   this.createReplayGroup_(tile, frameState);
 };
 
