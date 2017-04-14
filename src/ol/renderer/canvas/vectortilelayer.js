@@ -34,6 +34,8 @@ ol.renderer.canvas.VectorTileLayer = function(layer) {
   this.renderedLayerRevision_;
 
   this.tilesThatWouldBeUsed_ = [];
+  this.tileWorkQueue = {};
+  this.idleCallbackRequested = false;
 
   /**
    * @private
@@ -98,6 +100,32 @@ ol.renderer.canvas.VectorTileLayer.prototype.prepareFrame = function(frameState,
 
 ol.renderer.canvas.VectorTileLayer.prototype.loadedTileFilter = function(tile) {
   return tile.getReplayState().renderedRevision !== -1
+}
+
+ol.renderer.canvas.VectorTileLayer.prototype.tileWorkScheduler = function(tile, functionToRun) {
+  this.tileWorkQueue[tile.tileCoord.join(',')] = functionToRun
+  if (this.idleCallbackRequested) {
+    return;
+  }
+
+  var doWork = function(idleTime) {
+    this.idleCallbackRequested = false;
+    var tileKeys = Object.keys(this.tileWorkQueue).sort();
+    for (var i = 0; i < tileKeys.length; i++) {
+      var tileKey = tileKeys[i];
+      var isComplete = this.tileWorkQueue[tileKey](idleTime);
+      if (isComplete) {
+        delete this.tileWorkQueue[tileKey];
+      } else {
+        this.idleCallbackRequested = true;
+        window.requestIdleCallback(doWork);
+        return;
+      }
+    }
+  }.bind(this)
+
+  this.idleCallbackRequested = true;
+  window.requestIdleCallback(doWork);
 }
 
 
@@ -182,17 +210,17 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
   }
 
   var boundRenderFeatures = renderFeatures.bind(this);
-  window.requestIdleCallback(boundRenderFeatures);
+  this.tileWorkScheduler(tile, boundRenderFeatures);
 
   var i = 0;
   function renderFeatures(idleTime) {
     if (replayState.inProgressRevision !== revision || replayState.inProgressRenderOrder !== renderOrder) {
-      return;
+      return true;
     }
     if (this.tilesThatWouldBeUsed_.indexOf(tile) === -1) {
       replayState.inProgressRevision = -1;
       replayState.inProgressRenderOrder = undefined;
-      return;
+      return true;
     }
     var feature;
     for (var ii = features.length; i < ii; ++i) {
@@ -202,8 +230,7 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
       }
       renderFeature.call(this, feature);
       if (idleTime.timeRemaining() === 0) {
-        window.requestIdleCallback(boundRenderFeatures);
-        return;
+        return false;
       }
     }
 
@@ -216,6 +243,8 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
     replayState.resolution = NaN;
 
     this.renderIfReadyAndVisible();
+    console.log('replay done', tile.tileCoord.join(', '))
+    return true;
   }
 };
 
