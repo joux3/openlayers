@@ -74,7 +74,7 @@ ol.renderer.Layer.prototype.createLoadedTileFinder = function(source, projection
       function(zoom, tileRange) {
         function callback(tile) {
           if (tileFilter && !tileFilter(tile)) {
-            return;
+            return false;
           }
           if (!tiles[zoom]) {
             tiles[zoom] = {};
