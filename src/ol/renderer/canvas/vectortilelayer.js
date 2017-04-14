@@ -29,12 +29,6 @@ ol.renderer.canvas.VectorTileLayer = function(layer) {
 
   /**
    * @private
-   * @type {boolean}
-   */
-  this.dirty_ = false;
-
-  /**
-   * @private
    * @type {number}
    */
   this.renderedLayerRevision_;
@@ -161,7 +155,6 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
       }
       var dirty = this.renderFeature(feature, squaredTolerance, styles,
           replayGroup);
-      this.dirty_ = this.dirty_ || dirty;
       replayState.dirty = replayState.dirty || dirty;
     }
   }
