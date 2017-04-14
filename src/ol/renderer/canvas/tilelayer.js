@@ -153,18 +153,16 @@ ol.renderer.canvas.TileLayer.prototype.prepareFrame = function(frameState, layer
       if (!this.isDrawableTile_(tile)) {
         tile = tile.getInterimTile();
       }
-      if (this.isDrawableTile_(tile)) {
+      if (this.isDrawableTile_(tile) && this.loadedTileFilter(tile)) {
         if (tile.getState() == ol.TileState.LOADED) {
-          if (this.loadedTileFilter(tile)) {
-            tilesToDrawByZ[z][tile.tileCoord.toString()] = tile;
-            if (!newTiles && this.renderedTiles.indexOf(tile) == -1) {
-              newTiles = true;
-            }
-          } else {
-            this.tileWouldBeUsed(tile, frameState);
+          tilesToDrawByZ[z][tile.tileCoord.toString()] = tile;
+          if (!newTiles && this.renderedTiles.indexOf(tile) == -1) {
+            newTiles = true;
           }
         }
         continue;
+      } else if (this.isDrawableTile_(tile)) {
+        this.tileWouldBeUsed(tile, frameState);
       }
 
       var fullyLoaded = tileGrid.forEachTileCoordParentTileRange(
