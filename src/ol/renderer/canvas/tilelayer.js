@@ -161,7 +161,7 @@ ol.renderer.canvas.TileLayer.prototype.prepareFrame = function(frameState, layer
           }
         }
         continue;
-      } else if (this.isDrawableTile_(tile)) {
+      } else if (this.isDrawableTile_(tile) && tile.getState() == ol.TileState.LOADED) {
         this.tileWouldBeUsed(tile, frameState);
       }
 

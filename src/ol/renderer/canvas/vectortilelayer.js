@@ -243,7 +243,6 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
     replayState.resolution = NaN;
 
     this.renderIfReadyAndVisible();
-    console.log('replay done', tile.tileCoord.join(', '))
     return true;
   }
 };
@@ -466,7 +465,7 @@ ol.renderer.canvas.VectorTileLayer.prototype.renderTileImage_ = function(
   var replayState = tile.getReplayState();
   var revision = layer.getRevision();
   var replays = ol.renderer.canvas.VectorTileLayer.IMAGE_REPLAYS[layer.getRenderMode()];
-  if (replays && replayState.renderedTileRevision < revision) {
+  if (replays && replayState.renderedTileRevision !== revision) {
     replayState.renderedTileRevision = revision;
     var tileCoord = tile.tileCoord;
     var z = tile.tileCoord[0];
