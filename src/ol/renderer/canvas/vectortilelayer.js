@@ -386,9 +386,6 @@ ol.renderer.canvas.VectorTileLayer.prototype.postCompose = function(context, fra
     var zs = [];
     for (var i = tiles.length - 1; i >= 0; --i) {
       var tile = /** @type {ol.VectorTile} */ (tiles[i]);
-      if (!tile.getReplayState().replayGroup) {
-        continue
-      }
       // Create a clip mask for regions in this low resolution tile that are
       // already filled by a higher resolution tile
       var transform = this.getReplayTransform_(tile, frameState);
