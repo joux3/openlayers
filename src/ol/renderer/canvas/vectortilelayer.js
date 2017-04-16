@@ -230,6 +230,7 @@ ol.renderer.canvas.VectorTileLayer.prototype.createReplayGroup_ = function(tile,
       }
       renderFeature.call(this, feature);
       if (idleTime.timeRemaining() === 0) {
+        ++i;
         return false;
       }
     }
