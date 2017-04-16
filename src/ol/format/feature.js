@@ -100,6 +100,10 @@ ol.format.Feature.prototype.readFeature = function(source, opt_options) {};
  */
 ol.format.Feature.prototype.readFeatures = function(source, opt_options) {};
 
+ol.format.Feature.prototype.readFeaturesAsync = function(source, opt_options, callback) {
+  callback(this.readFeatures(source, opt_options));
+};
+
 
 /**
  * Read a single geometry from a source.

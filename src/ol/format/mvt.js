@@ -173,6 +173,48 @@ ol.format.MVT.prototype.readFeatures = function(source, opt_options) {
   return features;
 };
 
+ol.format.MVT.prototype.readFeaturesAsync = function(source, opt_options, callback) {
+  var layers = this.layers_;
+
+  var pbf = new ol.ext.pbf(/** @type {ArrayBuffer} */ (source));
+  var tile = new ol.ext.vectortile.VectorTile(pbf);
+  var features = [];
+  var featureClass = this.featureClass_;
+  var layer, feature;
+
+  var layerNames = Object.keys(tile.layers);
+  var j = 0;
+  var doReadFeaturesWork = function (idleTime) {
+    for (; j < layerNames.length; ++j) {
+      var name = layerNames[j];
+
+      if (layers && layers.indexOf(name) == -1) {
+        continue;
+      }
+
+      layer = tile.layers[name];
+
+      for (var i = 0, ii = layer.length; i < ii; ++i) {
+        if (featureClass === ol.render.Feature) {
+          feature = this.readRenderFeature_(layer.feature(i), name);
+        } else {
+          feature = this.readFeature_(layer.feature(i), name, opt_options);
+        }
+        features.push(feature);
+      }
+      if (idleTime.timeRemaining() == 0) {
+        ++j;
+        window.requestIdleCallback(doReadFeaturesWork);
+        return;
+      }
+    }
+
+    callback(features);
+  }.bind(this)
+
+  window.requestIdleCallback(doReadFeaturesWork);
+}
+
 
 /**
  * @inheritDoc
