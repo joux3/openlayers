@@ -184,6 +184,7 @@ ol.format.MVT.prototype.readFeaturesAsync = function(source, opt_options, callba
 
   var layerNames = Object.keys(tile.layers);
   var j = 0;
+  var i = 0;
   var doReadFeaturesWork = function (idleTime) {
     for (; j < layerNames.length; ++j) {
       var name = layerNames[j];
@@ -194,19 +195,21 @@ ol.format.MVT.prototype.readFeaturesAsync = function(source, opt_options, callba
 
       layer = tile.layers[name];
 
-      for (var i = 0, ii = layer.length; i < ii; ++i) {
+      for (var ii = layer.length; i < ii; ++i) {
         if (featureClass === ol.render.Feature) {
           feature = this.readRenderFeature_(layer.feature(i), name);
         } else {
           feature = this.readFeature_(layer.feature(i), name, opt_options);
         }
         features.push(feature);
+        if (idleTime.timeRemaining() == 0) {
+          ++i;
+          window.requestIdleCallback(doReadFeaturesWork);
+          return;
+        }
       }
-      if (idleTime.timeRemaining() == 0) {
-        ++j;
-        window.requestIdleCallback(doReadFeaturesWork);
-        return;
-      }
+      i = 0;
+
     }
 
     callback(features);
