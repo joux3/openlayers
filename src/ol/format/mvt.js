@@ -173,6 +173,9 @@ ol.format.MVT.prototype.readFeatures = function(source, opt_options) {
   return features;
 };
 
+/**
+ * @override
+ */
 ol.format.MVT.prototype.readFeaturesAsync = function(source, opt_options, callback) {
   var layers = this.layers_;
 

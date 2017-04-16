@@ -98,6 +98,10 @@ ol.renderer.canvas.VectorTileLayer.prototype.prepareFrame = function(frameState,
   return res;
 };
 
+/**
+ *
+ * @override
+ */
 ol.renderer.canvas.VectorTileLayer.prototype.loadedTileFilter = function(tile) {
   return tile.getReplayState().renderedRevision !== -1
 }
@@ -262,9 +266,13 @@ ol.renderer.canvas.VectorTileLayer.prototype.drawTileImage = function(
 };
 
 
+/**
+ *
+ * @override
+ */
 ol.renderer.canvas.VectorTileLayer.prototype.tileWouldBeUsed = function(tile, frameState) {
   this.tilesThatWouldBeUsed_.push(tile);
-  this.createReplayGroup_(tile, frameState);
+  this.createReplayGroup_(/** @type {ol.VectorTile} */ (tile), frameState);
 };
 
 

@@ -55,7 +55,7 @@ ol.featureloader.loadFeaturesXhr = function(url, format, success, failure) {
             }
             if (source) {
               format.readFeaturesAsync(source, {featureProjection: projection}, function(features) {
-                success.call(this, features, format.readProjection(source));
+                success.call(this, features, format.readProjection(/** @type {Object|null|string} */ (source)));
               });
             } else {
               failure.call(this);

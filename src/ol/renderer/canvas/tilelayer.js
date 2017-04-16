@@ -93,11 +93,21 @@ ol.renderer.canvas.TileLayer.prototype.isDrawableTile_ = function(tile) {
       tileState == ol.TileState.ERROR && !useInterimTilesOnError;
 };
 
-ol.renderer.canvas.TileLayer.prototype.loadedTileFilter = function() {
+/**
+ * @protected
+ * @param {ol.Tile} tile Tile.
+ * @return {boolean} Tile is prepared for drawing
+ */
+ol.renderer.canvas.TileLayer.prototype.loadedTileFilter = function(tile) {
   return true;
 };
 
-ol.renderer.canvas.TileLayer.prototype.tileWouldBeUsed = function() {};
+/**
+ * @protected
+ * @param {ol.Tile} tile Tile.
+ * @param {olx.FrameState} frameState Frame state.
+ */
+ol.renderer.canvas.TileLayer.prototype.tileWouldBeUsed = function(tile, frameState) {};
 
 /**
  * @inheritDoc
